@@ -1,4 +1,5 @@
-﻿using SRTPluginProviderRE2;
+﻿using SRTPluginBase;
+using SRTPluginProviderRE2;
 using SRTPluginProviderRE2.Structures;
 using System;
 using System.Diagnostics;
@@ -33,10 +34,12 @@ namespace SRTPluginUIRE2WinForms
         private Matrix inventoryNormalTransform = new Matrix(1f, 0f, 0f, 1f, 0f, 0f);
         private Matrix inventoryShiftedTransform = new Matrix(1f, 0f, 0f, 1f, Program.INV_SLOT_WIDTH, 0f);
 
+        private IPluginHostDelegates hostDelegates;
         private GameMemoryRE2 gameMemory;
 
-        public MainUI()
+        public MainUI(IPluginHostDelegates hostDelegates)
         {
+            this.hostDelegates = hostDelegates;
             InitializeComponent();
 
             // Set titlebar.
@@ -61,8 +64,8 @@ namespace SRTPluginUIRE2WinForms
             // Only run the following code if we're rendering inventory.
             if (!Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoInventory))
             {
-                GenerateImages();
-                Program.GenerateBrushes(inventoryItemImage, inventoryItemPatch1Image, inventoryError);
+                GenerateImages(this.hostDelegates);
+                Program.GenerateBrushes(this.hostDelegates, inventoryItemImage, inventoryItemPatch1Image, inventoryError);
 
                 // Set the width and height of the inventory display so it matches the maximum items and the scaling size of those items.
                 this.inventoryPanel.Width = Program.INV_SLOT_WIDTH * 4;
@@ -85,7 +88,7 @@ namespace SRTPluginUIRE2WinForms
             }
         }
 
-        public void GenerateImages()
+        public void GenerateImages(IPluginHostDelegates hostDelegates)
         {
             // Create a black slot image for when side-pack is not equipped.
             inventoryError = new Bitmap(Program.INV_SLOT_WIDTH, Program.INV_SLOT_HEIGHT, PixelFormat.Format32bppPArgb);
@@ -325,13 +328,16 @@ namespace SRTPluginUIRE2WinForms
             e.Graphics.DrawString("Enemy HP", new Font("Consolas", 10, FontStyle.Bold), Brushes.Red, 0, heightOffset + (heightGap * ++i), stdStringFormat);
             if (gameMemory.EnemyHealth != null)
             {
-                foreach (EnemyHP enemyHP in gameMemory.EnemyHealth.Where(a => a.IsAlive).OrderBy(a => a.Percentage).ThenByDescending(a => a.CurrentHP))
+                foreach (EnemyHP enemyHP in gameMemory.EnemyHealth.Where(a => a.IsAlive || a.IsTrigger).OrderBy(a => a.IsTrigger).ThenBy(a => a.Percentage).ThenByDescending(a => a.CurrentHP))
                 {
                     int x = 0;
                     int y = heightOffset + (heightGap * ++i);
 
                     DrawProgressBarGDI(e, backBrushGDI, foreBrushGDI, x, y, 146, heightGap, enemyHP.Percentage * 100f, 100f);
-                    e.Graphics.DrawString(string.Format("{0} {1:P1}", enemyHP.CurrentHP, enemyHP.Percentage), new Font("Consolas", 10, FontStyle.Bold), Brushes.Red, x, y, stdStringFormat);
+                    if (!enemyHP.IsTrigger)
+                        e.Graphics.DrawString(string.Format("{0} {1:P1}", enemyHP.CurrentHP, enemyHP.Percentage), new Font("Consolas", 10, FontStyle.Bold), Brushes.Red, x, y, stdStringFormat);
+                    else
+                        e.Graphics.DrawString("TRIGGER", new Font("Consolas", 10, FontStyle.Bold), Brushes.Red, x, y, stdStringFormat);
                 }
             }
         }

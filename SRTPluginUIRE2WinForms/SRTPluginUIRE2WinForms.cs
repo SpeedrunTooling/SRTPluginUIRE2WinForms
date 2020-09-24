@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,10 +54,10 @@ namespace SRTPluginUIRE2WinForms
             }));
 
             // Call the legacy code initialization.
-            Program.Main(new string[0]);
+            Program.Main(this.hostDelegates);
 
             // Create and start the form.
-            applicationContext = new ApplicationContext(new MainUI());
+            applicationContext = new ApplicationContext(new MainUI(this.hostDelegates));
             applicationTask = Task.Run(() =>
             {
                 Application.Run(applicationContext);
@@ -116,7 +117,7 @@ namespace SRTPluginUIRE2WinForms
         public static IReadOnlyDictionary<Weapon, System.Drawing.TextureBrush> WeaponToImageBrush;
         public static System.Drawing.TextureBrush ErrorToImageBrush;
 
-        public static void Main(string[] args) // NOT THE REAL ENTRYPOINT. THIS IS A PLACEHOLDER FOR LEGACY CODE TO BE PORTED.
+        public static void Main(IPluginHostDelegates hostDelegates) // NOT THE REAL ENTRYPOINT. THIS IS A PLACEHOLDER FOR LEGACY CODE TO BE PORTED.
         {
             try
             {
@@ -124,47 +125,47 @@ namespace SRTPluginUIRE2WinForms
                 programSpecialOptions = new Options();
                 programSpecialOptions.GetOptions();
 
-                foreach (string arg in args)
-                {
-                    if (arg.Equals("--Help", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        StringBuilder message = new StringBuilder("Command-line arguments:\r\n\r\n");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--No-Titlebar", "Hide the titlebar and window frame.");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Always-On-Top", "Always appear on top of other windows.");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Transparent", "Make the background transparent.");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--ScalingFactor=n", "Set the inventory slot scaling factor on a scale of 0.0 to 1.0. Default: 0.75 (75%)");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--NoInventory", "Disables the inventory display.");
-                        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Debug", "Debug mode.");
+                //foreach (string arg in args)
+                //{
+                //    if (arg.Equals("--Help", StringComparison.InvariantCultureIgnoreCase))
+                //    {
+                //        StringBuilder message = new StringBuilder("Command-line arguments:\r\n\r\n");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--No-Titlebar", "Hide the titlebar and window frame.");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Always-On-Top", "Always appear on top of other windows.");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Transparent", "Make the background transparent.");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--ScalingFactor=n", "Set the inventory slot scaling factor on a scale of 0.0 to 1.0. Default: 0.75 (75%)");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--NoInventory", "Disables the inventory display.");
+                //        message.AppendFormat("{0}\r\n\t{1}\r\n\r\n", "--Debug", "Debug mode.");
 
-                        MessageBox.Show(null, message.ToString().Trim(), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        Environment.Exit(0);
-                    }
+                //        MessageBox.Show(null, message.ToString().Trim(), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //        Environment.Exit(0);
+                //    }
 
-                    if (arg.Equals("--No-Titlebar", StringComparison.InvariantCultureIgnoreCase))
-                        programSpecialOptions.Flags |= ProgramFlags.NoTitleBar;
+                //    if (arg.Equals("--No-Titlebar", StringComparison.InvariantCultureIgnoreCase))
+                //        programSpecialOptions.Flags |= ProgramFlags.NoTitleBar;
 
-                    if (arg.Equals("--Always-On-Top", StringComparison.InvariantCultureIgnoreCase))
-                        programSpecialOptions.Flags |= ProgramFlags.AlwaysOnTop;
+                //    if (arg.Equals("--Always-On-Top", StringComparison.InvariantCultureIgnoreCase))
+                //        programSpecialOptions.Flags |= ProgramFlags.AlwaysOnTop;
 
-                    if (arg.Equals("--Transparent", StringComparison.InvariantCultureIgnoreCase))
-                        programSpecialOptions.Flags |= ProgramFlags.Transparent;
+                //    if (arg.Equals("--Transparent", StringComparison.InvariantCultureIgnoreCase))
+                //        programSpecialOptions.Flags |= ProgramFlags.Transparent;
 
-                    if (arg.Equals("--NoInventory", StringComparison.InvariantCultureIgnoreCase))
-                        programSpecialOptions.Flags |= ProgramFlags.NoInventory;
+                //    if (arg.Equals("--NoInventory", StringComparison.InvariantCultureIgnoreCase))
+                //        programSpecialOptions.Flags |= ProgramFlags.NoInventory;
 
-                    if (arg.StartsWith("--ScalingFactor=", StringComparison.InvariantCultureIgnoreCase))
-                        if (!double.TryParse(arg.Split(new char[1] { '=' }, 2, StringSplitOptions.None)[1], out programSpecialOptions.ScalingFactor))
-                            programSpecialOptions.ScalingFactor = 0.75d; // Default scaling factor for the inventory images. If we fail to process the user input, ensure this gets set to the default value just in case.
+                //    if (arg.StartsWith("--ScalingFactor=", StringComparison.InvariantCultureIgnoreCase))
+                //        if (!double.TryParse(arg.Split(new char[1] { '=' }, 2, StringSplitOptions.None)[1], out programSpecialOptions.ScalingFactor))
+                //            programSpecialOptions.ScalingFactor = 0.75d; // Default scaling factor for the inventory images. If we fail to process the user input, ensure this gets set to the default value just in case.
 
-                    if (arg.Equals("--Debug", StringComparison.InvariantCultureIgnoreCase))
-                        programSpecialOptions.Flags |= ProgramFlags.Debug;
-                }
+                //    if (arg.Equals("--Debug", StringComparison.InvariantCultureIgnoreCase))
+                //        programSpecialOptions.Flags |= ProgramFlags.Debug;
+                //}
 
                 // Set item slot sizes after scaling is determined.
                 INV_SLOT_WIDTH = (int)Math.Round(112d * programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot width.
                 INV_SLOT_HEIGHT = (int)Math.Round(112d * programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot height.
 
-                GenerateClipping();
+                GenerateClipping(hostDelegates);
             }
             catch (Exception ex)
             {
@@ -185,7 +186,7 @@ namespace SRTPluginUIRE2WinForms
 
         public static string GetExceptionMessage(Exception ex) => string.Format("[{0}] An unhandled exception has occurred. Please see below for details.\r\n\r\n[{1}] {2}\r\n{3}.", srtVersion, ex.GetType().ToString(), ex.Message, ex.StackTrace);
 
-        public static void GenerateClipping()
+        public static void GenerateClipping(IPluginHostDelegates hostDelegates)
         {
             int itemColumnInc = -1;
             int itemRowInc = -1;
@@ -470,14 +471,48 @@ namespace SRTPluginUIRE2WinForms
             };
         }
 
-        public static void GenerateBrushes(System.Drawing.Image item, System.Drawing.Image itemPatch1, System.Drawing.Image error)
+        public static void GenerateBrushes(IPluginHostDelegates hostDelegates, System.Drawing.Image item, System.Drawing.Image itemPatch1, System.Drawing.Image error)
         {
-            ItemToImageBrush = new Dictionary<ItemEnumeration, System.Drawing.TextureBrush>(
-                ItemToImageTranslation.Where(a => a.Key != ItemEnumeration.OldKey).Select(kvp => new KeyValuePair<ItemEnumeration, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(item, kvp.Value)))
-                .Concat(ItemToImageTranslation.Where(a => a.Key == ItemEnumeration.OldKey).Select(kvp => new KeyValuePair<ItemEnumeration, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(itemPatch1, kvp.Value))))
-                );
-            WeaponToImageBrush = new Dictionary<Weapon, System.Drawing.TextureBrush>(WeaponToImageTranslation.Select(kvp => new KeyValuePair<Weapon, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(item, kvp.Value))));
-            ErrorToImageBrush = new System.Drawing.TextureBrush(error, new System.Drawing.Rectangle(0, 0, INV_SLOT_WIDTH, INV_SLOT_HEIGHT));
+            try
+            {
+                ItemToImageBrush = new Dictionary<ItemEnumeration, System.Drawing.TextureBrush>(
+                    ItemToImageTranslation.Where(a => a.Key != ItemEnumeration.OldKey).Select(kvp => new KeyValuePair<ItemEnumeration, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(item, kvp.Value)))
+                    .Concat(ItemToImageTranslation.Where(a => a.Key == ItemEnumeration.OldKey).Select(kvp => new KeyValuePair<ItemEnumeration, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(itemPatch1, kvp.Value))))
+                    );
+                WeaponToImageBrush = new Dictionary<Weapon, System.Drawing.TextureBrush>(WeaponToImageTranslation.Select(kvp => new KeyValuePair<Weapon, System.Drawing.TextureBrush>(kvp.Key, new System.Drawing.TextureBrush(item, kvp.Value))));
+                ErrorToImageBrush = new System.Drawing.TextureBrush(error, new System.Drawing.Rectangle(0, 0, INV_SLOT_WIDTH, INV_SLOT_HEIGHT));
+            }
+            catch (OutOfMemoryException ex)
+            {
+                try
+                {
+                    List<KeyValuePair<ItemEnumeration, System.Drawing.Rectangle>> itemToImageTranslationWithZeroSize = ItemToImageTranslation.Where(a => a.Value.Height <= 0 || a.Value.Width <= 0).ToList();
+                    if (itemToImageTranslationWithZeroSize.Count > 0)
+                    {
+                        hostDelegates.OutputMessage.Invoke("ItemToImageTranslation: {0}", itemToImageTranslationWithZeroSize.Count);
+                        hostDelegates.OutputMessage.Invoke("Example: {0} has Width of {1} and Height of {2}.", itemToImageTranslationWithZeroSize[0].Key.ToString(), itemToImageTranslationWithZeroSize[0].Value.Width, itemToImageTranslationWithZeroSize[0].Value.Height);
+                    }
+
+                    List<KeyValuePair<Weapon, System.Drawing.Rectangle>> weaponToImageTranslationWithZeroSize = WeaponToImageTranslation.Where(a => a.Value.Height <= 0 || a.Value.Width <= 0).ToList();
+                    if (weaponToImageTranslationWithZeroSize.Count > 0)
+                    {
+                        hostDelegates.OutputMessage.Invoke("WeaponToImageTranslation: {0}", weaponToImageTranslationWithZeroSize.Count);
+                        hostDelegates.OutputMessage.Invoke("Example: {0} has Width of {1} and Height of {2}.", weaponToImageTranslationWithZeroSize[0].Key.ToString(), weaponToImageTranslationWithZeroSize[0].Value.Width, weaponToImageTranslationWithZeroSize[0].Value.Height);
+                    }
+
+                    if (INV_SLOT_WIDTH <= 0)
+                        hostDelegates.OutputMessage.Invoke("INV_SLOT_WIDTH: {0}", INV_SLOT_WIDTH);
+
+                    if (INV_SLOT_HEIGHT <= 0)
+                        hostDelegates.OutputMessage.Invoke("INV_SLOT_HEIGHT: {0}", INV_SLOT_WIDTH);
+                }
+                catch (Exception ex2)
+                {
+                    throw new AggregateException(ex2, ex);
+                }
+
+                throw ex;
+            }
         }
     }
 }
