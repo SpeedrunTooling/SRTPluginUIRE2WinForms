@@ -40,8 +40,8 @@ namespace SRTPluginUIRE2WinForms
 
             double.TryParse(RegistryHelper.GetValue(optionsKey, "ScalingFactor", "0.75"), out ScalingFactor);
 
-            // Do not permit ScalingFactor values less than or equal to 0% and greater than 400%.
-            if (ScalingFactor <= 0 || ScalingFactor > 4)
+            // Do not permit ScalingFactor values less than 7.5% and greater than 400%.
+            if (ScalingFactor < 0.075 || ScalingFactor > 4)
                 ScalingFactor = 0.75d;
         }
 

@@ -175,21 +175,30 @@ namespace SRTPluginUIRE2WinForms
                         healthBrush = Brushes.LawnGreen;
                         healthX = 15f;
                         currentHP = this.gameMemory.PlayerCurrentHealth.ToString();
-                        this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.FINE, "FINE");
+                        if (!this.gameMemory.PlayerPoisoned)
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.FINE, "FINE");
+                        else
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.POISON, "POISON");
                     }
                     else if (this.gameMemory.PlayerCurrentHealth <= 800 && this.gameMemory.PlayerCurrentHealth >= 361) // Caution (Yellow)
                     {
                         healthBrush = Brushes.Goldenrod;
                         healthX = 15f;
                         currentHP = this.gameMemory.PlayerCurrentHealth.ToString();
-                        this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.CAUTION_YELLOW, "CAUTION_YELLOW");
+                        if (!this.gameMemory.PlayerPoisoned)
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.CAUTION_YELLOW, "CAUTION_YELLOW");
+                        else
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.POISON, "POISON");
                     }
                     else if (this.gameMemory.PlayerCurrentHealth <= 360) // Danger (Red)
                     {
                         healthBrush = Brushes.Red;
                         healthX = 15f;
                         currentHP = this.gameMemory.PlayerCurrentHealth.ToString();
-                        this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.DANGER, "DANGER");
+                        if (!this.gameMemory.PlayerPoisoned)
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.DANGER, "DANGER");
+                        else
+                            this.playerHealthStatus.ThreadSafeSetHealthImage(Properties.Resources.POISON, "POISON");
                     }
 
                     this.playerHealthStatus.Invalidate();
