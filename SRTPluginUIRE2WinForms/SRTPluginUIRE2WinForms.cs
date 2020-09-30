@@ -12,10 +12,10 @@ using System.Windows.Forms;
 
 namespace SRTPluginUIRE2WinForms
 {
-    public class SRTPluginUIRE2WinForms : IPluginUI
+    public class SRTPluginUIRE2WinForms : PluginBase, IPluginUI
     {
         internal static PluginInfo _Info = new PluginInfo();
-        public IPluginInfo Info => _Info;
+        public override IPluginInfo Info => _Info;
         public string RequiredProvider => "SRTPluginProviderRE2";
 
         private IPluginHostDelegates hostDelegates;
@@ -26,9 +26,10 @@ namespace SRTPluginUIRE2WinForms
         private bool oneTimeInit = false;
 
         [STAThread]
-        public int Startup(IPluginHostDelegates hostDelegates)
+        public override int Startup(IPluginHostDelegates hostDelegates)
         {
             this.hostDelegates = hostDelegates;
+            Program.config = LoadConfiguration<PluginConfiguration>();
 
             if (!oneTimeInit)
             {
@@ -69,8 +70,10 @@ namespace SRTPluginUIRE2WinForms
             return 0;
         }
 
-        public int Shutdown()
+        public override int Shutdown()
         {
+            SaveConfiguration(Program.config);
+
             // Clean up the context.
             if (applicationContext != null)
             {
@@ -102,7 +105,7 @@ namespace SRTPluginUIRE2WinForms
 
     public static class Program
     {
-        public static Options programSpecialOptions;
+        public static PluginConfiguration config;
 
         public static readonly string srtVersion = string.Format("v{0}.{1}.{2}.{3}", SRTPluginUIRE2WinForms._Info.VersionMajor, SRTPluginUIRE2WinForms._Info.VersionMinor, SRTPluginUIRE2WinForms._Info.VersionBuild, SRTPluginUIRE2WinForms._Info.VersionRevision);
         public static readonly string srtTitle = string.Format("RE2(2019) SRT - {0}", srtVersion);
@@ -122,9 +125,6 @@ namespace SRTPluginUIRE2WinForms
             try
             {
                 // Handle command-line parameters.
-                programSpecialOptions = new Options();
-                programSpecialOptions.GetOptions();
-
                 //foreach (string arg in args)
                 //{
                 //    if (arg.Equals("--Help", StringComparison.InvariantCultureIgnoreCase))
@@ -162,8 +162,8 @@ namespace SRTPluginUIRE2WinForms
                 //}
 
                 // Set item slot sizes after scaling is determined.
-                INV_SLOT_WIDTH = (int)Math.Round(112d * programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot width.
-                INV_SLOT_HEIGHT = (int)Math.Round(112d * programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot height.
+                INV_SLOT_WIDTH = (int)Math.Round(112d * Program.config.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot width.
+                INV_SLOT_HEIGHT = (int)Math.Round(112d * Program.config.ScalingFactor, MidpointRounding.AwayFromZero); // Individual inventory slot height.
 
                 GenerateClipping(hostDelegates);
             }

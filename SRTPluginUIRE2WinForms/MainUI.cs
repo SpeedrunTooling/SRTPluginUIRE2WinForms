@@ -55,14 +55,14 @@ namespace SRTPluginUIRE2WinForms
             this.statisticsPanel.Paint += this.statisticsPanel_Paint;
             this.inventoryPanel.Paint += this.inventoryPanel_Paint;
 
-            if (Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoTitleBar))
+            if (Program.config.NoTitlebar)
                 this.FormBorderStyle = FormBorderStyle.None;
 
-            if (Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.Transparent))
+            if (Program.config.Transparent)
                 this.TransparencyKey = Color.Black;
 
             // Only run the following code if we're rendering inventory.
-            if (!Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoInventory))
+            if (!Program.config.NoInventory)
             {
                 GenerateImages(this.hostDelegates);
                 Program.GenerateBrushes(this.hostDelegates, inventoryItemImage, inventoryItemPatch1Image, inventoryError);
@@ -111,12 +111,12 @@ namespace SRTPluginUIRE2WinForms
             }
 
             // Rescales the image down if the scaling factor is not 1.
-            if (Program.programSpecialOptions.ScalingFactor != 1d)
+            if (Program.config.ScalingFactor != 1d)
             {
                 try
                 {
-                    inventoryItemImage = new Bitmap(inventoryItemImage, (int)Math.Round(inventoryItemImage.Width * Program.programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero), (int)Math.Round(inventoryItemImage.Height * Program.programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero));
-                    inventoryItemPatch1Image = new Bitmap(inventoryItemPatch1Image, (int)Math.Round(inventoryItemPatch1Image.Width * Program.programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero), (int)Math.Round(inventoryItemPatch1Image.Height * Program.programSpecialOptions.ScalingFactor, MidpointRounding.AwayFromZero));
+                    inventoryItemImage = new Bitmap(inventoryItemImage, (int)Math.Round(inventoryItemImage.Width * Program.config.ScalingFactor, MidpointRounding.AwayFromZero), (int)Math.Round(inventoryItemImage.Height * Program.config.ScalingFactor, MidpointRounding.AwayFromZero));
+                    inventoryItemPatch1Image = new Bitmap(inventoryItemPatch1Image, (int)Math.Round(inventoryItemPatch1Image.Width * Program.config.ScalingFactor, MidpointRounding.AwayFromZero), (int)Math.Round(inventoryItemPatch1Image.Height * Program.config.ScalingFactor, MidpointRounding.AwayFromZero));
                 }
                 catch (Exception ex)
                 {
@@ -141,23 +141,6 @@ namespace SRTPluginUIRE2WinForms
             this.gameMemory = (GameMemoryRE2)gameMemory;
             try
             {
-                if (Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.AlwaysOnTop))
-                {
-                    bool hasFocus;
-                    if (this.InvokeRequired)
-                        hasFocus = PInvoke.HasActiveFocus((IntPtr)this.Invoke(new Func<IntPtr>(() => this.Handle)));
-                    else
-                        hasFocus = PInvoke.HasActiveFocus(this.Handle);
-
-                    if (!hasFocus)
-                    {
-                        if (this.InvokeRequired)
-                            this.Invoke(new Action(() => this.TopMost = true));
-                        else
-                            this.TopMost = true;
-                    }
-                }
-
                 if (this.gameMemory.PlayerCurrentHealth != previousHealth)
                 {
                     previousHealth = this.gameMemory.PlayerCurrentHealth;
@@ -203,7 +186,7 @@ namespace SRTPluginUIRE2WinForms
 
                     this.playerHealthStatus.Invalidate();
                 }
-                if (!Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoInventory))
+                if (!Program.config.NoInventory)
                 {
                     if (!this.gameMemory.PlayerInventory.SequenceEqual(previousInventory))
                         this.inventoryPanel.Invalidate();
@@ -243,7 +226,7 @@ namespace SRTPluginUIRE2WinForms
                 }
             }
 
-            if (!Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoInventory) && gameMemory.PlayerInventory != null)
+            if (!Program.config.NoInventory && gameMemory.PlayerInventory != null)
             {
                 e.Graphics.SmoothingMode = smoothingMode;
                 e.Graphics.CompositingQuality = compositingQuality;
@@ -317,7 +300,7 @@ namespace SRTPluginUIRE2WinForms
             // IGT Display.
             e.Graphics.DrawString(string.Format("{0}", gameMemory.IGTFormattedString), new Font("Consolas", 16, FontStyle.Bold), Brushes.White, 0, 0, stdStringFormat);
 
-            if (Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.Debug))
+            if (Program.config.Debug)
             {
                 e.Graphics.DrawString("Raw IGT", new Font("Consolas", 9, FontStyle.Bold), Brushes.Gray, 0, 25, stdStringFormat);
                 //e.Graphics.DrawString("A:" + gameMemory.IGTRunningTimer.ToString("00000000000000000000"), new Font("Consolas", 9, FontStyle.Bold), (gameMemory.IsRunning) ? Brushes.DarkRed : Brushes.Gray, 0, 38, stdStringFormat);
@@ -372,7 +355,7 @@ namespace SRTPluginUIRE2WinForms
 
         private void inventoryPanel_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!Program.programSpecialOptions.Flags.HasFlag(ProgramFlags.NoInventory))
+            if (!Program.config.NoInventory)
                 if (e.Button == MouseButtons.Left)
                     PInvoke.DragControl(((DoubleBufferedPanel)sender).Parent.Handle);
         }
