@@ -11,9 +11,9 @@
     <Copyright>Copyright © 2020 Travis J Gutjahr</Copyright>
     <Product>Resident Evil 2 (2019) WinForms User Interface Plugin</Product>
     <Description>A user-interface plugin to display the values provided by the RE2 Provider Plugin in a WinForms window.</Description>
-    <Version>1.6.0</Version>
-    <FileVersion>1.6.0.0</FileVersion>
-    <AssemblyVersion>1.6.0.0</AssemblyVersion>
+    <Version>1.6.1</Version>
+    <FileVersion>1.6.1.0</FileVersion>
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
     <!-- netcoreapp3.1 had to be hardcoded here because this project reports $(TargetFramework) as netstandard2.0 (rightfully so) and I am not sure how this project's csproj can auto-detect another project's framework version to copy it to the appropriate folder so we're just... hardcoding this. -->
     <CopyDestionationPath>$(SolutionDir)..\SRTHost\SRTHost\bin\$(Configuration)\netcoreapp3.1\plugins</CopyDestionationPath>
   </PropertyGroup>

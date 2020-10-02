@@ -5,8 +5,6 @@ namespace SRTPluginUIRE2WinForms
 {
     public partial class OptionsUI : Form
     {
-        private bool alwaysOnTop;
-
         public OptionsUI()
         {
             InitializeComponent();
