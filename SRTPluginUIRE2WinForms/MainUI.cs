@@ -221,7 +221,14 @@ namespace SRTPluginUIRE2WinForms
                 for (int i = 0; i < previousInventory.Length; ++i)
                 {
                     previousInventory[i].SlotPosition = i;
-                    previousInventory[i].Data = InventoryEntry.EMPTY_INVENTORY_ITEM;
+                    previousInventory[i].Data = new int[5]
+                    {
+                        0x00000000,
+                        unchecked((int)0xFFFFFFFF),
+                        0x00000000,
+                        0x00000000,
+                        0x01000000
+                    };
                     previousInventory[i].InvDataOffset = 0L;
                 }
             }
